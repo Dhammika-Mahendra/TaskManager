@@ -19,7 +19,7 @@ export class AuthService {
     }
     
     login(loginRequest: any): Observable<any> {
-      return this.http.post(BASE_URL + "api/auth/login", loginRequest);
+      return this.http.post(BASE_URL + "api/auth/log", loginRequest);
     }
 
 }

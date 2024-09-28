@@ -6,8 +6,9 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth/auth.service';
+import { StorageService } from '../../services/storage/storage.service';
 
 @Component({
   selector: 'app-login',
@@ -23,13 +24,12 @@ export class LoginComponent {
 
   constructor(
     private fb: FormBuilder,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
     ) {
     this.loginForm = this.fb.group({
-      name: [null, [Validators.required]],
-      email: [null, [Validators.required, Validators.email]], 
-      password: [null, [Validators.required]],
-      confirmPassword: [null, [Validators.required]],
+      email: [null, [Validators.required]],
+      password: [null, [Validators.required]]
     })
   }
 
@@ -38,9 +38,26 @@ export class LoginComponent {
   }
 
   onSubmit() {
-    this.authService.signup(this.loginForm.value).subscribe((res) => {
-      if (res.id != null) {
-        alert('Signup successful');
+    this.authService.login(this.loginForm.value).subscribe((res) => {
+      
+    if (res.id != null) {
+      const user = {
+        id: res.id,
+        role: res.role
+      }
+      console.log('Login successful');
+
+      StorageService.saveUser(user); 
+      StorageService.saveToken (res.jwt);
+
+      if (StorageService.isAdminLoggedIn()) {
+        console.log('Admin logged in');
+        this.router.navigate(["/admin"]);
+      }else if(StorageService.isEmployeeLoggedIn()){
+        console.log('Employee logged in');
+        this.router.navigate(["/employee"]);
+      } 
+
       }else{
         alert('Signup failed');
       }
