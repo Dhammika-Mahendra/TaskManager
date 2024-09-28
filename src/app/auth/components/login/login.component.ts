@@ -7,6 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { RouterLink } from '@angular/router';
+import { AuthService } from '../../services/auth/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -20,7 +21,10 @@ export class LoginComponent {
   loginForm!: FormGroup; 
   hidePassword = true;
 
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService
+    ) {
     this.loginForm = this.fb.group({
       name: [null, [Validators.required]],
       email: [null, [Validators.required, Validators.email]], 
@@ -33,7 +37,13 @@ export class LoginComponent {
     this.hidePassword = !this.hidePassword;
   }
 
-  onSubmit(){
-    console.log(this.loginForm.value)
+  onSubmit() {
+    this.authService.signup(this.loginForm.value).subscribe((res) => {
+      if (res.id != null) {
+        alert('Signup successful');
+      }else{
+        alert('Signup failed');
+      }
+    })
   }
 }

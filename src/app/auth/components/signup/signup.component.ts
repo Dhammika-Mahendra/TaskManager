@@ -8,6 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { AuthService } from '../../services/auth/auth.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -23,7 +24,11 @@ export class SignupComponent {
   signupForm!: FormGroup; 
   hidePassword = true;
 
-  constructor(private fb: FormBuilder, private authService: AuthService, private snackBar: MatSnackBar) {
+  constructor(
+    private fb: FormBuilder, 
+    private authService: AuthService, 
+    private router: Router
+    ) {
     this.signupForm = this.fb.group({
       name: [null, [Validators.required]],
       email: [null, [Validators.required, Validators.email]], 
@@ -38,19 +43,18 @@ export class SignupComponent {
 
 
   onSubmit() {
-    console.log(this.signupForm.value);
     const password = this.signupForm.get("password")?.value;
     const confirmPassword = this.signupForm.get("confirmPassword")?.value;
     if (password !== confirmPassword) {
-      console.log('Password do not match');
-      this.snackBar.open("Password do not match", "Close", { duration: 5000, panelClass: "error-snackbar" });
+      alert('Password do not match');
       return;
     }
     this.authService.signup(this.signupForm.value).subscribe((res) => {
-      if (res.userId != null) {
-        this.snackBar.open("Signup successful", "Close", { duration: 5000 });
+      if (res.id != null) {
+        this.router.navigate(["/login"]);
+        alert('Signup successful');
       }else{
-        this.snackBar.open("Signup failed", "Close", { duration: 5000, panelClass: "error-snackbar" });
+        alert('Signup failed');
       }
     })
   }
